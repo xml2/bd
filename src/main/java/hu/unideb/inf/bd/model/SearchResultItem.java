@@ -2,6 +2,9 @@ package hu.unideb.inf.bd.model;
 
 import java.time.LocalDate;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,7 +24,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 		"author",
 		"title",
 		"date",
-		"format"
+		"format",
+		"isbn"
 	}
 )
 public class SearchResultItem {
@@ -43,6 +47,9 @@ public class SearchResultItem {
 	@XmlElement(required = true)
 	private String format;
 
+	@XmlElement(required = true)
+	private String isbn;
+
 	public SearchResultItem() {
 	}
 
@@ -52,6 +59,7 @@ public class SearchResultItem {
 		this.title = title;
 		this.date = date;
 		this.format = format;
+		setIsbn();
 	}
 
 	public String getUri() {
@@ -94,6 +102,22 @@ public class SearchResultItem {
 		this.format = format;
 	}
 
+	public String getIsbn() {
+		return isbn;
+	}
+
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
+	}
+
+	private void setIsbn() {
+		Pattern pattern = Pattern.compile(".*/(\\d+X?)$");
+		Matcher matcher = pattern.matcher(uri);
+		if (matcher.matches()) {
+			isbn = matcher.group(1);
+		}
+	}
+
 	public String toString() {
 		return ReflectionToStringBuilder.toString(this);
 	}
@@ -105,6 +129,7 @@ public class SearchResultItem {
 		item.setTitle("Wonderbook");
 		item.setDate(LocalDate.of(2013, 10, 15));
 		item.setFormat("Paperback");
+		item.setIsbn();
 		System.out.println(item);
 		try {
 			hu.unideb.inf.jaxb.JAXBUtil.toXML(item, System.out);
